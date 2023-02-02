@@ -36,7 +36,7 @@ const Signup = () => {
 
     return (
         <div className='w-full h-full  shadow justify-self-center flex justify-center items-center flex-col'>
-            <div className="w-2/6  border-2 shadow rounded-2xl ">
+            <div className="w-5/6 sm:w-5/6 md:w-4/6 lg:w-3/6 xl:w-2/6  border-2 shadow rounded-2xl ">
             <h1 className='text-center text-4xl my-2'>Sign Up</h1>
             <form className='flex flex-col items-center my-10' onSubmit={(e)=>handleSubmit(e)}>
                 <input name="email" className="w-10/12 border-2 my-4 p-3 rounded-2xl" type="email" id="email" placeholder='Email'  onChange={(e)=> handleChange(e)}/>
