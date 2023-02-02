@@ -27,10 +27,7 @@ const LinksTable = () => {
                 getLinksFromFirebase.push({...doc.data(), id:doc.id})
             });
             
-                dispatch(addURLS(getLinksFromFirebase));
-            
-
-            console.log(getLinksFromFirebase)
+            dispatch(addURLS(getLinksFromFirebase));
             setLoading(false);
         });
         return ()=>subscribe();
