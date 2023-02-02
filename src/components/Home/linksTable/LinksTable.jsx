@@ -1,11 +1,51 @@
-import React from 'react'
+import React,{useEffect,useState} from 'react'
 import { useSelector } from 'react-redux'
-
 import Tippy from '@tippy.js/react'
 import 'tippy.js/dist/tippy.css'
+import moment from 'moment'
+import {db , auth} from '../../../utils/firebase/firebase'
+import {useContext} from 'react'
+import {AuthContext} from   '../../../features/context/Auth'
+import { useDispatch } from 'react-redux'
+import { addURL,addURLS } from '../../../features/URLSlicer/URLSlicer'
+
 
 const LinksTable = () => {
-    const  URLS  = useSelector((state) => state.URLReducer.URLS)
+    
+    let URLS =useSelector((state) => state.URLReducer.URLS);
+    const dispatch = useDispatch();
+    const [loading,setLoading] = useState(true)
+    const {currentUser} = useContext(AuthContext)
+    
+
+    useEffect(() => {
+        if(currentUser){
+
+        const getLinksFromFirebase =[];
+        const subscribe = db.collection('Urls').where('email','==',currentUser?.email).onSnapshot((querySnapshot)=>{
+            querySnapshot.forEach((doc)=>{
+                getLinksFromFirebase.push({...doc.data(), id:doc.id})
+            });
+            
+                dispatch(addURLS(getLinksFromFirebase));
+            
+
+            console.log(getLinksFromFirebase)
+            setLoading(false);
+        });
+        return ()=>subscribe();
+    }else{
+        setLoading(false);
+        
+    }
+        
+    
+    }, [])
+
+    if(loading){
+        return <h1>Loading...</h1>
+    }
+
 
     return (
 
@@ -41,7 +81,7 @@ const LinksTable = () => {
                                 </Tippy>
                             </td>
                             <td className="px-6 py-4">
-                                {url.createdAt}
+                                {moment(url?.createdAt?.seconds).format('YYYY-MM-DD HH:mm:ss')}
                             </td>
                         </tr>
                     ))}

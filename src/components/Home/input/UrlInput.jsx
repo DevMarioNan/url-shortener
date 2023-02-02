@@ -3,22 +3,49 @@ import { shorten } from '../../../utils/API'
 import { useDispatch } from 'react-redux'
 import { addURL } from '../../../features/URLSlicer/URLSlicer'
 import moment from 'moment/moment'
-
+import {useContext} from 'react'
+import {AuthContext} from   '../../../features/context/Auth'
+import { doc,addDoc,collection } from "firebase/firestore";
+import { db } from '../../../utils/firebase/firebase'
+import userEvent from '@testing-library/user-event'
 
 const UrlInput = () => {
+    const {currentUser} = useContext(AuthContext)
     const [input, setInput] = useState('')
     const [error, setError] = useState(false)
     const dispatch = useDispatch()
 
     const handleURL = () => {
         const url = shorten(input);
-        url.then((res)=>{
+        url.then(async (res)=>{
             if(res?.data[0]?.code !== undefined){
-                dispatch(addURL({
-                    originalUrl: res.data[0].long,
-                    shortUrl: `gotiny.cc/${res.data[0].code}` ,
-                    createdAt: moment().format("YYYY-MM-DD HH:mm:ss")
-                }))
+                if(!currentUser){
+                    dispatch(addURL({
+                        originalUrl: res.data[0].long,
+                        shortUrl: `gotiny.cc/${res.data[0].code}` ,
+                        createdAt:{
+                            seconds: moment().format("YYYY-MM-DD HH:mm:ss")
+                        }
+                    }))
+                }else{
+                    const docRef = await addDoc(collection(db, "Urls"), {
+                        email: currentUser.email,
+                        originalUrl: res.data[0].long,
+                        shortUrl: `gotiny.cc/${res.data[0].code}` ,
+                        createdAt:{
+                            seconds: moment().format("YYYY-MM-DD HH:mm:ss")
+                        }
+                    });
+                    dispatch(addURL({
+                        id:docRef.id,
+                        email: currentUser.email,
+                        originalUrl: res.data[0].long,
+                        shortUrl: `gotiny.cc/${res.data[0].code}` ,
+                        createdAt:{
+                            seconds: moment().format("YYYY-MM-DD HH:mm:ss")
+                        }
+                    }))
+                }
             }else{
                 setError(true);
             }

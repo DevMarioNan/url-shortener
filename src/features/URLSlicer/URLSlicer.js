@@ -10,10 +10,13 @@ export const URLSlicer = createSlice({
     reducers: {
         addURL: (state, action) => {
             state.URLS = [ action.payload,...state.URLS];
+        },
+        addURLS: (state, action) => {
+            state.URLS = action.payload;
         }
     }
 });
 
-export const { addURL,getURLs } = URLSlicer.actions;
+export const { addURL,addURLS } = URLSlicer.actions;
 
 export default URLSlicer.reducer;
